@@ -1,46 +1,52 @@
-![Banner image](https://user-images.githubusercontent.com/10284570/173569848-c624317f-42b1-45a6-ab09-f0ea3c247648.png)
+# n8n-nodes-timeout
 
-# n8n-nodes-starter
+This is an n8n community node. It lets you use _Timeout_ nodes in your n8n workflows. Useful in home automation flows.
 
-This repo contains example nodes to help you get started building your own custom integrations for [n8n](https://n8n.io). It includes the node linter and other dependencies.
+The timeout node takes incoming events from the trigger input and delays them for a given period of time. But unlike the
+_Wait_ node, whenever a new event arrives within the waiting period, the timeout of the previous execution is cancelled
+and it will stop without emitting an event to subsequent nodes.
 
-To make your custom node available to the community, you must create it as an npm package, and [submit it to the npm registry](https://docs.npmjs.com/packages-and-modules/contributing-packages-to-the-registry).
+## Use-cases
+Timeout nodes are especially useful in home-automation if you want to observe interruptions in an event stream.
+Consider a sensor which reports its measurements regularly via a webhook. If the sensor stops transmitting (low battery,
+lost network connection) for some time, you can detect this failure and notify the user about it.
 
-## Prerequisites
+A different use-case is to turn something on (a light, a pump) for a certain duration and have it turned off automatically.
+While this could also be achieved with a simple _Wait_ node (turn on -> wait -> turn off), you can get into trouble if this
+workflow is triggered again before an earlier execution has finished.
+[!Screenshot of a workflow which uses a Timout node to control auto-off of an actuator](./Actuator_TO.png)
 
-You need the following installed on your development machine:
+[n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/reference/license/) workflow automation platform.
 
-* [git](https://git-scm.com/downloads)
-* Node.js and pnpm. Minimum version Node 20. You can find instructions on how to install both using nvm (Node Version Manager) for Linux, Mac, and WSL [here](https://github.com/nvm-sh/nvm). For Windows users, refer to Microsoft's guide to [Install NodeJS on Windows](https://docs.microsoft.com/en-us/windows/dev-environment/javascript/nodejs-on-windows).
-* Install n8n with:
-  ```
-  npm install n8n -g
-  ```
-* Recommended: follow n8n's guide to [set up your development environment](https://docs.n8n.io/integrations/creating-nodes/build/node-development-environment/).
+[Installation](#installation)  
+[Operations](#operations)  
+[Compatibility](#compatibility)  
+[Usage](#usage)  <!-- delete if not using this section -->  
+[Resources](#resources)  
+[Version history](#version-history)  <!-- delete if not using this section -->  
 
-## Using this starter
+## Installation
 
-These are the basic steps for working with the starter. For detailed guidance on creating and publishing nodes, refer to the [documentation](https://docs.n8n.io/integrations/creating-nodes/).
+Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes/installation/) in the n8n community nodes documentation.
 
-1. [Generate a new repository](https://github.com/n8n-io/n8n-nodes-starter/generate) from this template repository.
-2. Clone your new repo:
-   ```
-   git clone https://github.com/<your organization>/<your-repo-name>.git
-   ```
-3. Run `npm i` to install dependencies.
-4. Open the project in your editor.
-5. Browse the examples in `/nodes` and `/credentials`. Modify the examples, or replace them with your own nodes.
-6. Update the `package.json` to match your details.
-7. Run `npm lint` to check for errors or `npm lintfix` to automatically fix errors when possible.
-8. Test your node locally. Refer to [Run your node locally](https://docs.n8n.io/integrations/creating-nodes/test/run-node-locally/) for guidance.
-9. Replace this README with documentation for your node. Use the [README_TEMPLATE](README_TEMPLATE.md) to get started.
-10. Update the LICENSE file to use your details.
-11. [Publish](https://docs.npmjs.com/packages-and-modules/contributing-packages-to-the-registry) your package to npm.
+## Operations
 
-## More information
+_List the operations supported by your node._
 
-Refer to our [documentation on creating nodes](https://docs.n8n.io/integrations/creating-nodes/) for detailed information on building your own nodes.
+## Compatibility
 
-## License
+_State the minimum n8n version, as well as which versions you test against. You can also include any known version incompatibility issues._
 
-[MIT](https://github.com/n8n-io/n8n-nodes-starter/blob/master/LICENSE.md)
+## Usage
+
+Connect the flow of an event source (usually a _Webhook_) to the _Trigger_ input of the _Timeout_ node. If you need events
+to cancel the timeout altogether without triggering a new timeout, connect these event to the _Cancel_ input. This could be
+events from an _If_ branch or from a different source (like a second _Webhook_).
+It is totally fine to leave the _Cancel_ input unconnected, e.g. if you only want to detect the disruption of incoming events.
+
+If you have an event stream of similar events (e.g. multiple sensors), you can use a unique id from their payload (sensor id)
+in the optional _scope_ parameter. This will trigger independent timeouts for each unique scope.
+
+## Resources
+
+* [n8n community nodes documentation](https://docs.n8n.io/integrations/#community-nodes)

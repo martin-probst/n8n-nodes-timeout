@@ -2,19 +2,20 @@
 
 This is an n8n community node. It lets you use _Timeout_ nodes in your n8n workflows. Useful in home automation flows.
 
-The timeout node takes incoming events from the trigger input and delays them for a given period of time. But unlike the
-_Wait_ node, whenever a new event arrives within the waiting period, the timeout of the previous execution is cancelled
-and it will stop without emitting an event to subsequent nodes.
+The _Timeout_ node takes incoming events from the trigger input and delays them for a given period of time. But unlike the
+_Wait_ node, whenever a new event arrives within the waiting period, the previous execution which is waiting for the
+timeout will stop without emitting an event to subsequent nodes.
 ![A workflow which uses a Timeout node to detect and alert about a sensor failure](./Sensor_Failure.png)
 
 ## Use-cases
-Timeout nodes are especially useful in home-automation if you want to observe interruptions in an event stream.
+_Timeout_ nodes are especially useful in home-automation if you want to observe interruptions in an event stream.
 Consider a sensor which reports its measurements regularly via a webhook. If the sensor stops transmitting (low battery,
 lost network connection) for some time, you can detect this failure and notify the user about it.
 
 A different use-case is to turn something on (a light, a pump) for a certain duration and have it turned off automatically.
 While this could also be achieved with a simple _Wait_ node (turn on -> wait -> turn off), you can get into trouble if this
-workflow is triggered again before an earlier execution has finished.
+workflow is triggered again before an earlier execution has finished. With _Timeout_, subsequent triggers will simply
+reset the timeout while preventing multiple action execution later in the flow.
 ![A workflow which uses a Timout node to control auto-off of an actuator](./Actuator_TO.png)
 
 [n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/reference/license/) workflow automation platform.
